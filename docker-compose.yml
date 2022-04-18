@@ -1,0 +1,74 @@
+version: '3.1'
+services:
+  API:
+    image: 'blog-api-docker-hassan.jar'
+    ports:
+      - "8080:8080"
+    depends_on:
+      PostgreSQL:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://PostgreSQL:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  PostgreSQL:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+       - "5050:80"
+    restart: unless-stopped
+
+#docker build -t blog-api-docker-hassan.jar .
+#docker-compose up
+
+#services:
+#  API:
+#    image: 'blog-api-docker-hassan.jar'
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      PostgreSQL:
+#        condition: service_healthy
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://PostgreSQL:5432/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#  PostgreSQL:
+#    container_name: postgres
+#    image: postgres
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: password
+#      PGDATA: /data/postgres
+#    ports:
+#      - "5555:5432"
+#    restart: unless-stopped
+#  pgadmin:
+#    container_name: pgadmin
+#    image: dpage/pgadmin4
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+#      PGADMIN_DEFAULT_PASSWORD: root
+#      PGADMIN_CONFIG_SERVER_MODE: 'False'
+#    ports:
+#      - "5050:80"
+#    restart: unless-stopped
